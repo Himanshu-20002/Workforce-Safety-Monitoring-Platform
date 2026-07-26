@@ -126,3 +126,124 @@ curl -X POST http://localhost:3000/api/violations \
   }'
 ```
 *(Ensure to replace `"worker-uuid-here"` with an actual worker's ID from the database/dashboard).*
+
+---
+
+## 5. Database Schema
+
+GuardOps uses a strongly typed PostgreSQL relational schema designed using Drizzle ORM:
+
+### 1. `user` Table
+Stores account credentials, profile details, and role assignments:
+*   `id` (text, Primary Key)
+*   `name` (text, Non-Null)
+*   `email` (text, Non-Null, Unique)
+*   `emailVerified` (boolean)
+*   `image` (text)
+*   `role` (varchar, default: 'worker') — `'admin' | 'supervisor' | 'worker'`
+*   `site` (text) — Assigned safety location zone
+*   `status` (text, default: 'Active') — `'Active' | 'Pending' | 'Escalated'`
+*   `jobProfile` (text)
+*   *Indexes:* Optimized search index on the `role` column.
+
+### 2. `violation` Table
+Logs safety breaches captured from IoT telemetry:
+*   `id` (text, Primary Key)
+*   `type` (varchar) — e.g., `no_helmet`, `no_vest`
+*   `description` (text) — telemetry log summary
+*   `severity` (varchar, default: 'medium')
+*   `status` (varchar, default: 'Pending') — `'Pending' | 'Acknowledged'`
+*   `workerId` (text) — Foreign key references `user.id`
+*   `locationId` (text) — Foreign key references `location.id`
+*   `createdAt` & `updatedAt` (timestamp)
+*   *Indexes:* High-frequency query indexes on `status`, `createdAt`, and relationships.
+
+### 3. `location` Table
+Tracks active sites/zones monitored by security systems:
+*   `id` (text, Primary Key)
+*   `name` (text, Unique) — Site name
+*   `description` (text)
+*   `riskLevel` (varchar)
+
+### 4. Better Auth Required Tables (`session`, `account`, `verification`)
+Auto-generated and managed by Better Auth to store secure browser session tokens and OAuth credentials.
+
+---
+
+## 6. Project Documentation & File Structure
+
+Here is a guide to the project workspace directory structure:
+
+```
+guard-ops/
+├── app/                             # Next.js App Router Pages & API Routes
+│   ├── (admin)/                     # Admin Route Group (Dashboard, Alerts, Workers, Supervisors)
+│   ├── (auth)/                      # Authentication Pages (Sign In / Register)
+│   ├── (supervisor)/                # Supervisor Route Group (Dashboard, Workers, Violations, Analytics, Reports)
+│   ├── api/                         # Backend APIs (Authentication & Ingestion endpoints)
+│   └── layout.tsx                   # Main layout wrapper
+├── components/                      # UI Components
+│   ├── dashboard/                   # Metric cards, statistics widgets, and charts
+│   ├── layout/                      # Shared layouts (sidebar navigation)
+│   ├── ui/                          # Shared UI elements (Button, Input, Toast notifications)
+│   └── workers/                     # Shared worker management table & actions
+├── actions/                         # Next.js type-safe Server Actions
+│   ├── alerts.ts                    # Handles escalated admin alerts queries
+│   ├── dashboard.ts                 # Fetches administrative statistical summaries
+│   └── violations.ts                # Acknowledges worker safety violations
+├── lib/                             # Core utilities and settings
+│   ├── db/                          # Database Client & Drizzle Schema configuration
+│   └── auth.ts                      # Better Auth server configuration
+└── scripts/                         # Seeding scripts (importing workers spreadsheet & demo users)
+```
+
+---
+
+## 7. API Documentation
+
+### 1. Ingest Safety Violation (IoT Telemetry Webhook)
+Endpoint to log real-time worker safety infractions detected by cameras.
+*   **URL:** `/api/violations`
+*   **Method:** `POST`
+*   **Auth Required:** No (Public endpoint for cameras)
+*   **Request Body (JSON):**
+    ```json
+    {
+      "workerId": "string (UUID representing the worker)",
+      "site": "string (The name of the location where the violation occurred)",
+      "violationType": "string (e.g., 'no_helmet', 'no_vest', 'no_harness')"
+    }
+    ```
+*   **Responses:**
+    *   **200 OK:** Violation registered successfully.
+        ```json
+        { "success": true, "violationId": "uuid", "message": "Violation recorded successfully." }
+        ```
+    *   **400 Bad Request:** Missing required fields.
+    *   **404 Not Found:** Worker ID does not exist in database.
+
+### 2. Create Demo User (Simulation Endpoint)
+Helper API to programmatically provision testing accounts.
+*   **URL:** `/api/test/create-demo-user`
+*   **Method:** `POST`
+*   **Request Body (JSON):**
+    ```json
+    {
+      "email": "user@example.com",
+      "password": "securepassword",
+      "name": "User Name",
+      "role": "admin | supervisor"
+    }
+    ```
+*   **Response:**
+    *   **200 OK:**
+        ```json
+        { "success": true, "user": { "id": "uuid", "email": "user@example.com", "name": "User Name" } }
+        ```
+
+### 3. Better Auth Core Endpoints
+Handled automatically by the catch-all router (`/api/auth/*`):
+*   `POST /api/auth/sign-in/email` — Authenticate credentials.
+*   `POST /api/auth/sign-up/email` — Create user accounts (stores inputs like name, email, password, and role).
+*   `POST /api/auth/sign-out` — Terminate user session.
+*
