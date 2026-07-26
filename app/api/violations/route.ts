@@ -17,9 +17,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify worker exists
+    // Verify worker exists (accepts both internal ID and employeeId like WRK0001)
     const workerExists = await db.query.user.findFirst({
-      where: (user, { eq }) => eq(user.id, workerId),
+      where: (user, { eq, or }) =>
+        or(eq(user.id, workerId), eq(user.employeeId, workerId)),
     });
 
     if (!workerExists) {
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
       description: `IoT camera alert: Detected ${violationType.replace('_', ' ')} safety violation.`,
       severity: 'high',
       status: 'Pending',
-      workerId,
+      workerId: workerExists.id, // Save the actual database user UUID id
       locationId: loc.id,
       createdAt: new Date(),
       updatedAt: new Date(),
