@@ -91,6 +91,7 @@ export function Sidebar({ session }: SidebarProps) {
         ]
       : [
           { name: 'Dashboard', href: '/supervisor/dashboard', icon: LayoutDashboard },
+          { name: 'Workers', href: '/supervisor/workers', icon: Users },
           { name: 'Violations', href: '/supervisor/violations', icon: ShieldAlert },
           { name: 'Analytics', href: '/supervisor/analytics', icon: BarChart3 },
           { name: 'Reports', href: '/supervisor/reports', icon: FileText },
