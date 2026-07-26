@@ -11,6 +11,8 @@ const workerSchema = z.object({
   site: z.string().min(2, 'Site must be specified'),
   status: z.enum(['Active', 'Pending', 'Escalated']),
   jobProfile: z.string().optional(),
+  mobileNumber: z.string().optional(),
+  aadharNumber: z.string().optional(),
 });
 
 interface WorkerRowActionsProps {
@@ -20,6 +22,8 @@ interface WorkerRowActionsProps {
     site: string | null;
     status: string | null;
     jobProfile: string | null;
+    mobileNumber?: string | null;
+    aadharNumber?: string | null;
   };
 }
 
@@ -35,6 +39,8 @@ export function WorkerRowActions({ worker }: WorkerRowActionsProps) {
   const [site, setSite] = useState(worker.site || '');
   const [status, setStatus] = useState<any>(worker.status || 'Active');
   const [jobProfile, setJobProfile] = useState(worker.jobProfile || '');
+  const [mobileNumber, setMobileNumber] = useState(worker.mobileNumber || '');
+  const [aadharNumber, setAadharNumber] = useState(worker.aadharNumber || '');
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +53,8 @@ export function WorkerRowActions({ worker }: WorkerRowActionsProps) {
         site,
         status,
         jobProfile,
+        mobileNumber,
+        aadharNumber,
       });
 
       if (!parsed.success) {
@@ -159,6 +167,32 @@ export function WorkerRowActions({ worker }: WorkerRowActionsProps) {
                   onChange={(e) => setSite(e.target.value)}
                   className="w-full px-3.5 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
                   required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
+                  Mobile Number
+                </label>
+                <input
+                  type="text"
+                  value={mobileNumber}
+                  onChange={(e) => setMobileNumber(e.target.value)}
+                  placeholder="e.g. 9876543210"
+                  className="w-full px-3.5 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
+                  Aadhar Number
+                </label>
+                <input
+                  type="text"
+                  value={aadharNumber}
+                  onChange={(e) => setAadharNumber(e.target.value)}
+                  placeholder="e.g. 1234 5678 9012"
+                  className="w-full px-3.5 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
               </div>
 

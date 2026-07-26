@@ -2,7 +2,7 @@
 
 import { db } from '@/lib/db';
 import { user } from '@/lib/db/schema';
-import { eq, and, ilike, sql } from 'drizzle-orm';
+import { eq, and, ilike, sql, or } from 'drizzle-orm';
 
 interface FetchWorkersOptions {
   search?: string;
@@ -22,7 +22,14 @@ export async function getWorkers(options: FetchWorkersOptions = {}) {
     const conditions = [eq(user.role, 'worker')];
 
     if (search) {
-      conditions.push(ilike(user.name, `%${search}%`));
+      conditions.push(
+        or(
+          ilike(user.name, `%${search}%`),
+          ilike(user.employeeId, `%${search}%`),
+          ilike(user.mobileNumber, `%${search}%`),
+          ilike(user.aadharNumber, `%${search}%`)
+        )!
+      );
     }
 
     if (site && site !== 'all') {
@@ -77,7 +84,14 @@ export async function deleteWorker(id: string) {
 
 export async function updateWorker(
   id: string,
-  data: { name: string; site: string; status: string; jobProfile?: string }
+  data: {
+    name: string;
+    site: string;
+    status: string;
+    jobProfile?: string;
+    mobileNumber?: string;
+    aadharNumber?: string;
+  }
 ) {
   try {
     await db
@@ -87,6 +101,8 @@ export async function updateWorker(
         site: data.site,
         status: data.status,
         jobProfile: data.jobProfile || null,
+        mobileNumber: data.mobileNumber || null,
+        aadharNumber: data.aadharNumber || null,
         updatedAt: new Date(),
       })
       .where(eq(user.id, id));

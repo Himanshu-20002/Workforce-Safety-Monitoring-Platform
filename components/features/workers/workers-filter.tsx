@@ -46,7 +46,7 @@ export function WorkersFilter({ sites, currentSearch = '', currentSite = 'all' }
     <div className="flex flex-col sm:flex-row gap-4 mb-6">
       <div className="flex-1">
         <Input
-          placeholder="Search workers by name..."
+          placeholder="Search workers by name, ID, mobile, or Aadhar..."
           defaultValue={currentSearch}
           onChange={(e) => handleSearch(e.target.value)}
           className="w-full"

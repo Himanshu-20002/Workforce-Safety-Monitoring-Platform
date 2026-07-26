@@ -52,6 +52,8 @@ export async function WorkersPageContent({ searchParams, readOnly = false }: Wor
               <tr>
                 <th className="px-6 py-4">Employee ID</th>
                 <th className="px-6 py-4">Worker Name</th>
+                <th className="px-6 py-4">Mobile No.</th>
+                <th className="px-6 py-4">Aadhar No.</th>
                 <th className="px-6 py-4">Site</th>
                 <th className="px-6 py-4">Job Profile</th>
                 <th className="px-6 py-4">Status</th>
@@ -61,7 +63,7 @@ export async function WorkersPageContent({ searchParams, readOnly = false }: Wor
             <tbody className="divide-y divide-border bg-card">
               {workers.length === 0 ? (
                 <tr>
-                  <td colSpan={readOnly ? 5 : 6} className="px-6 py-12">
+                  <td colSpan={readOnly ? 7 : 8} className="px-6 py-12">
                     <div className="flex flex-col items-center justify-center text-center space-y-3">
                       <div className="p-3 rounded-full bg-muted text-muted-foreground">
                         <Users className="h-6 w-6" />
@@ -69,7 +71,7 @@ export async function WorkersPageContent({ searchParams, readOnly = false }: Wor
                       <div>
                         <p className="font-semibold text-foreground">No workers found</p>
                         <p className="text-xs text-muted-foreground max-w-xs mt-1">
-                          No personnel matched the name search or selected safety site location.
+                          No personnel matched the search or selected safety site location.
                         </p>
                       </div>
                     </div>
@@ -95,6 +97,12 @@ export async function WorkersPageContent({ searchParams, readOnly = false }: Wor
                       </td>
                       <td className="px-6 py-4 font-semibold text-foreground">
                         {worker.name}
+                      </td>
+                      <td className="px-6 py-4 text-muted-foreground font-mono text-xs whitespace-nowrap">
+                        {worker.mobileNumber || 'N/A'}
+                      </td>
+                      <td className="px-6 py-4 text-muted-foreground font-mono text-xs whitespace-nowrap">
+                        {worker.aadharNumber || 'N/A'}
                       </td>
                       <td className="px-6 py-4 text-muted-foreground">
                         {worker.site}
