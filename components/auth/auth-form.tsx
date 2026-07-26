@@ -25,7 +25,7 @@ export function AuthForm({ mode: initialMode = 'sign-in' }: { mode?: 'sign-in' |
           email,
           password,
         });
-        
+
         if (authError) {
           setError(authError.message || 'Invalid email or password');
           setLoading(false);
@@ -168,19 +168,29 @@ export function AuthForm({ mode: initialMode = 'sign-in' }: { mode?: 'sign-in' |
         <div className="mt-6 rounded-md bg-muted p-4 text-sm space-y-3">
           <div>
             <p className="font-medium text-foreground mb-2">Quick Start:</p>
-            <p className="text-muted-foreground">1. Click "Sign Up" to create an account</p>
-            <p className="text-muted-foreground">2. Choose your role (Admin, Supervisor, or Worker)</p>
-            <p className="text-muted-foreground">3. After signup, you'll be logged in</p>
+            <p className="text-muted-foreground">1. Choose a demo account below or click "Sign Up" to create one</p>
+            <p className="text-muted-foreground">2. Select your role (Admin or Supervisor)</p>
           </div>
-          <div className="border-t border-border pt-2">
-            <p className="font-medium text-foreground mb-1">Demo Credentials to Try:</p>
-            <p className="text-muted-foreground">
-              Email: <code className="font-mono bg-background px-1 py-0.5 rounded">admin@example.com</code>
-            </p>
-            <p className="text-muted-foreground">
-              Password: <code className="font-mono bg-background px-1 py-0.5 rounded">admin123</code>
-            </p>
-            <p className="text-xs text-muted-foreground mt-2">(Create this account in Sign Up first)</p>
+          <div className="border-t border-border pt-3 space-y-2">
+            <p className="font-medium text-foreground mb-1">Demo Credentials:</p>
+            <div className="bg-background/60 p-2 rounded border border-border">
+              <p className="font-semibold text-xs text-foreground uppercase tracking-wider mb-1">Admin User</p>
+              <p className="text-muted-foreground">
+                Email: <code className="font-mono bg-background px-1 py-0.5 rounded">admin@example.com</code>
+              </p>
+              <p className="text-muted-foreground">
+                Password: <code className="font-mono bg-background px-1 py-0.5 rounded">admin123</code>
+              </p>
+            </div>
+            <div className="bg-background/60 p-2 rounded border border-border">
+              <p className="font-semibold text-xs text-foreground uppercase tracking-wider mb-1">Supervisor User</p>
+              <p className="text-muted-foreground">
+                Email: <code className="font-mono bg-background px-1 py-0.5 rounded">supervisor@example.com</code>
+              </p>
+              <p className="text-muted-foreground">
+                Password: <code className="font-mono bg-background px-1 py-0.5 rounded">supervisor123</code>
+              </p>
+            </div>
           </div>
         </div>
       )}

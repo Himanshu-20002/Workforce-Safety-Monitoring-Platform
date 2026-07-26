@@ -255,4 +255,3 @@ Handled automatically by the catch-all router (`/api/auth/*`):
 *   `POST /api/auth/sign-in/email` — Authenticate credentials.
 *   `POST /api/auth/sign-up/email` — Create user accounts (stores inputs like name, email, password, and role).
 *   `POST /api/auth/sign-out` — Terminate user session.
-*
