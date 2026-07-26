@@ -5,13 +5,14 @@ export async function POST(req: Request) {
   try {
     const { email, password, name, role } = await req.json();
 
-    // Use Better Auth to create user via internal API
-    const result = await auth.api.signUpEmail({
-      email,
-      password,
-      name,
-      metadata: { role },
-    } as any);
+    const result = (await auth.api.signUpEmail({
+      body: {
+        email,
+        password,
+        name,
+        role,
+      },
+    })) as any;
 
     if (!result || !result.user) {
       throw new Error('Failed to create user');
