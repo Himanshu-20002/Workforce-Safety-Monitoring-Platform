@@ -10,12 +10,12 @@ GuardOps connects remote IoT/AI safety cameras with administrators and site supe
 
 ```mermaid
 graph TD
-    A[IoT / AI Safety Cameras] -->|POST /api/violations| B(GuardOps Webhook API)
-    B -->|Insert Violation status: Pending| C[(PostgreSQL DB)]
+    A[IoT / AI Safety Cameras] -->|POST /api/violations| B[GuardOps Webhook API]
+    B -->|Insert Violation status: Pending| C[PostgreSQL Database]
     D[Admin Officer] -->|Review escalated alerts > 10m| E[Admin Dashboard]
     F[Safety Supervisor] -->|Confirm & Acknowledge| G[Supervisor Dashboard]
-    E -.->|Query DB| C
-    G -.->|Acknowledge/Update status| C
+    E -->|Query DB| C
+    G -->|Acknowledge/Update status| C
     H[Better Auth Middleware] -->|Authenticate & Router Guard| D
     H -->|Authenticate & Router Guard| F
 ```
