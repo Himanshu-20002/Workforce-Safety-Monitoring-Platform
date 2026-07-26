@@ -1,5 +1,5 @@
 import { getViolations } from '@/actions/violations';
-import { ReportsDashboard } from '@/components/reports/reports-dashboard';
+import { ReportsDashboard } from '@/components/features/reports/reports-dashboard';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { auth } from '@/lib/auth';

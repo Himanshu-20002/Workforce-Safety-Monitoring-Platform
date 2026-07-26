@@ -1,8 +1,8 @@
 import { getWorkers } from '@/actions/workers';
-import { WorkersFilter } from '@/components/workers/workers-filter';
-import { WorkersPagination } from '@/components/workers/workers-pagination';
+import { WorkersFilter } from './workers-filter';
+import { WorkersPagination } from './workers-pagination';
 import { Users } from 'lucide-react';
-import { WorkerRowActions } from '@/components/workers/worker-row-actions';
+import { WorkerRowActions } from './worker-row-actions';
 
 interface WorkersPageContentProps {
   searchParams: {

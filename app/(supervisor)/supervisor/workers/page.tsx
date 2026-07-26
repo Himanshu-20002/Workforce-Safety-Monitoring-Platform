@@ -1,4 +1,4 @@
-import { WorkersPageContent } from '@/components/workers/workers-page-content';
+import { WorkersPageContent } from '@/components/features/workers/workers-page-content';
 
 interface PageProps {
   searchParams: Promise<{

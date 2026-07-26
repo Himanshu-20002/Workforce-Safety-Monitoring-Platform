@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { auth } from '@/lib/auth';
-import { SupervisorDashboard } from '@/components/dashboard/supervisor-dashboard';
+import { SupervisorDashboard } from '@/components/features/dashboard/supervisor-dashboard';
 import { getSupervisorStats } from '@/actions/dashboard';
 
 export default async function SupervisorDashboardPage() {

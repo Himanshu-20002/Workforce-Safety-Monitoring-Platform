@@ -16,7 +16,7 @@ import {
   Legend,
 } from 'recharts';
 import { Activity, ShieldAlert, BarChart3, PieChartIcon } from 'lucide-react';
-import DashboardCharts from '@/components/dashboard/dashboard-charts';
+import DashboardCharts from '@/components/features/dashboard/dashboard-charts';
 
 const COLORS = ['#2563eb', '#10b981', '#f43f5e', '#f59e0b', '#06b6d4', '#8b5cf6'];
 

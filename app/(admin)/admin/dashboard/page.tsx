@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { auth } from '@/lib/auth';
-import { AdminDashboard } from '@/components/dashboard/admin-dashboard';
+import { AdminDashboard } from '@/components/features/dashboard/admin-dashboard';
 import { getAdminStats } from '@/actions/dashboard';
 
 export default async function AdminDashboardPage() {

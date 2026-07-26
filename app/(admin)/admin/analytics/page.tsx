@@ -2,7 +2,7 @@ import { getAnalyticsData } from '@/actions/analytics';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { auth } from '@/lib/auth';
-import { LazyAnalyticsDashboard } from '@/components/analytics/lazy-analytics-dashboard';
+import { LazyAnalyticsDashboard } from '@/components/features/analytics/lazy-analytics-dashboard';
 
 export default async function AnalyticsPage() {
   const session = await auth.api.getSession({ headers: await headers() });

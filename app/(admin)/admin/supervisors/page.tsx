@@ -1,5 +1,5 @@
 import { getSupervisors } from '@/actions/supervisors';
-import { SupervisorManager } from '@/components/supervisors/supervisor-manager';
+import { SupervisorManager } from '@/components/features/supervisors/supervisor-manager';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { auth } from '@/lib/auth';

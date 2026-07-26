@@ -1,5 +1,5 @@
 import { getViolations } from '@/actions/violations';
-import { ViolationsList } from '@/components/violations/violations-list';
+import { ViolationsList } from '@/components/features/violations/violations-list';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { auth } from '@/lib/auth';
