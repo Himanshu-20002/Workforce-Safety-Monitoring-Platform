@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, varchar } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, boolean, varchar, index } from 'drizzle-orm/pg-core';
 
 // --- Better Auth required tables -------------------------------------------
 // Column names are camelCase to match Better Auth's defaults. Do not rename.
@@ -18,7 +18,9 @@ export const user = pgTable('user', {
   aadharNumber: text('aadharNumber'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
-});
+}, (table) => [
+  index('user_role_idx').on(table.role),
+]);
 
 export const session = pgTable('session', {
   id: text('id').primaryKey(),
@@ -82,7 +84,11 @@ export const alert = pgTable('alert', {
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
   resolvedAt: timestamp('resolvedAt'),
-});
+}, (table) => [
+  index('alert_status_idx').on(table.status),
+  index('alert_severity_idx').on(table.severity),
+  index('alert_created_at_idx').on(table.createdAt),
+]);
 
 export const violation = pgTable('violation', {
   id: text('id').primaryKey(),
@@ -98,7 +104,12 @@ export const violation = pgTable('violation', {
   resolvedAt: timestamp('resolvedAt'),
   acknowledgedAt: timestamp('acknowledgedAt'),
   resolution: text('resolution'),
-});
+}, (table) => [
+  index('violation_status_idx').on(table.status),
+  index('violation_created_at_idx').on(table.createdAt),
+  index('violation_worker_id_idx').on(table.workerId),
+  index('violation_location_id_idx').on(table.locationId),
+]);
 
 export const location = pgTable('location', {
   id: text('id').primaryKey(),

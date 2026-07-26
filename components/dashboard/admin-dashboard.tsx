@@ -1,7 +1,5 @@
-'use client';
-
 import { DashboardView } from './dashboard';
 
-export function AdminDashboard({ stats }: { stats: any }) {
-  return <DashboardView role="admin" stats={stats} />;
+export function AdminDashboard({ stats, user }: { stats: any; user: any }) {
+  return <DashboardView role="admin" stats={stats} user={user} />;
 }

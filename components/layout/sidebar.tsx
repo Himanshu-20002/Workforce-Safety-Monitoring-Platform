@@ -16,6 +16,7 @@ import {
   Moon,
   LogOut,
   ChevronDown,
+  BarChart3,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -91,6 +92,7 @@ export function Sidebar({ session }: SidebarProps) {
       : [
           { name: 'Dashboard', href: '/supervisor/dashboard', icon: LayoutDashboard },
           { name: 'Violations', href: '/supervisor/violations', icon: ShieldAlert },
+          { name: 'Analytics', href: '/supervisor/analytics', icon: BarChart3 },
           { name: 'Reports', href: '/supervisor/reports', icon: FileText },
         ];
 

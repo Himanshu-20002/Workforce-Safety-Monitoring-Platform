@@ -5,7 +5,7 @@ import { type NextRequest, NextResponse } from 'next/server';
  * Better Auth handles most of the authentication logic, we just redirect unauthenticated users
  */
 
-const PUBLIC_ROUTES = ['/sign-in', '/sign-up', '/api/auth'];
+const PUBLIC_ROUTES = ['/sign-in', '/sign-up', '/api/auth', '/api/violations'];
 
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -29,12 +29,6 @@ export function middleware(request: NextRequest) {
 
   // Allow public and auth API routes
   if (PUBLIC_ROUTES.some((route) => pathname.startsWith(route))) {
-    // Redirect authenticated users away from sign-in/sign-up
-    if (hasSessionCookie && (pathname === '/sign-in' || pathname === '/sign-up')) {
-      const redirectUrl = request.nextUrl.clone();
-      redirectUrl.pathname = '/';
-      return NextResponse.redirect(redirectUrl);
-    }
     return NextResponse.next();
   }
 

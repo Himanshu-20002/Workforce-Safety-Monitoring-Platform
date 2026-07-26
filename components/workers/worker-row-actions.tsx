@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { deleteWorker, updateWorker } from '@/actions/workers';
 import { Edit2, Trash2, X, AlertTriangle } from 'lucide-react';
 import { z } from 'zod';
+import { useToast } from '@/components/ui/toast';
 
 const workerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -27,6 +28,7 @@ export function WorkerRowActions({ worker }: WorkerRowActionsProps) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { toast } = useToast();
 
   // Form states
   const [name, setName] = useState(worker.name);
@@ -55,14 +57,18 @@ export function WorkerRowActions({ worker }: WorkerRowActionsProps) {
 
       const res = await updateWorker(worker.id, parsed.data);
       if (res.success) {
+        toast(`Worker profile for ${name} updated successfully.`, 'success');
         setIsEditOpen(false);
         window.location.reload();
       } else {
-        setError(res.error || 'Failed to update');
+        const errMsg = res.error || 'Failed to update';
+        setError(errMsg);
+        toast(errMsg, 'error');
         setLoading(false);
       }
     } catch (err) {
       setError('An unexpected error occurred');
+      toast('An unexpected error occurred', 'error');
       setLoading(false);
     }
   };
@@ -74,14 +80,18 @@ export function WorkerRowActions({ worker }: WorkerRowActionsProps) {
     try {
       const res = await deleteWorker(worker.id);
       if (res.success) {
+        toast(`Worker ${worker.name} removed successfully.`, 'success');
         setIsDeleteOpen(false);
         window.location.reload();
       } else {
-        setError(res.error || 'Failed to delete');
+        const errMsg = res.error || 'Failed to delete';
+        setError(errMsg);
+        toast(errMsg, 'error');
         setLoading(false);
       }
     } catch (err) {
       setError('An unexpected error occurred');
+      toast('An unexpected error occurred', 'error');
       setLoading(false);
     }
   };

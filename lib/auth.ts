@@ -34,21 +34,11 @@ export const auth = betterAuth({
       role: {
         type: 'string',
         input: true,
-        default: 'worker',
+        default: 'supervisor',
       },
     },
   },
-  hooks: {
-    // Update user role when metadata is passed during signup
-    async afterSignUp({ user: newUser }) {
-      if ((newUser as any).metadata?.role) {
-        await db
-          .update(user)
-          .set({ role: (newUser as any).metadata.role })
-          .where(eq(user.id, newUser.id));
-      }
-    },
-  },
+
   ...(process.env.NODE_ENV === 'development'
     ? {
         advanced: {

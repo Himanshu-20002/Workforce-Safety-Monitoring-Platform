@@ -13,5 +13,5 @@ export default async function SupervisorDashboardPage() {
 
   const stats = await getSupervisorStats();
 
-  return <SupervisorDashboard stats={stats} />;
+  return <SupervisorDashboard stats={stats} user={session.user} />;
 }

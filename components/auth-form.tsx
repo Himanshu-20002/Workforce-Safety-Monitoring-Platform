@@ -10,7 +10,7 @@ export function AuthForm({ mode: initialMode = 'sign-in' }: { mode?: 'sign-in' |
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [role, setRole] = useState<'admin' | 'supervisor' | 'worker'>('worker');
+  const [role, setRole] = useState<'admin' | 'supervisor'>('supervisor');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -101,11 +101,10 @@ export function AuthForm({ mode: initialMode = 'sign-in' }: { mode?: 'sign-in' |
               </label>
               <select
                 value={role}
-                onChange={(e) => setRole(e.target.value as 'admin' | 'supervisor' | 'worker')}
+                onChange={(e) => setRole(e.target.value as 'admin' | 'supervisor')}
                 disabled={loading}
                 className="w-full px-3 py-2 rounded-md border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               >
-                <option value="worker">Worker</option>
                 <option value="supervisor">Supervisor</option>
                 <option value="admin">Admin</option>
               </select>

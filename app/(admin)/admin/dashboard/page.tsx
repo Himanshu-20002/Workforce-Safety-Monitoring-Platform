@@ -13,5 +13,5 @@ export default async function AdminDashboardPage() {
 
   const stats = await getAdminStats();
 
-  return <AdminDashboard stats={stats} />;
+  return <AdminDashboard stats={stats} user={session.user} />;
 }

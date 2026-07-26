@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { acknowledgeViolation } from '@/actions/violations';
-import { ShieldCheck, AlertCircle, Clock, CheckCircle } from 'lucide-react';
+import { ShieldCheck, AlertCircle, Clock, CheckCircle, AlertTriangle, X } from 'lucide-react';
+import { useToast } from '@/components/ui/toast';
 
 interface ViolationRow {
   id: string;
@@ -25,21 +26,40 @@ export function ViolationsList({ initialViolations }: ViolationsListProps) {
   const [violations, setViolations] = useState<ViolationRow[]>(initialViolations);
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const { toast } = useToast();
 
-  const handleAcknowledge = async (id: string) => {
+  // Confirmation modal state
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [selectedViolation, setSelectedViolation] = useState<ViolationRow | null>(null);
+
+  const triggerAcknowledgeConfirm = (violation: ViolationRow) => {
+    setSelectedViolation(violation);
+    setIsConfirmOpen(true);
+  };
+
+  const handleAcknowledge = async () => {
+    if (!selectedViolation) return;
+    const id = selectedViolation.id;
     setError('');
     setLoadingId(id);
+    setIsConfirmOpen(false);
 
     try {
       const res = await acknowledgeViolation(id);
       if (res.success) {
+        toast(`Acknowledge logged for ${selectedViolation.workerName}'s violation.`, 'success');
+        setSelectedViolation(null);
+        // Refresh violations list locally or refresh router
         window.location.reload();
       } else {
-        setError(res.error || 'Failed to acknowledge');
+        const errMsg = res.error || 'Failed to acknowledge';
+        setError(errMsg);
+        toast(errMsg, 'error');
         setLoadingId(null);
       }
     } catch (err) {
       setError('An unexpected error occurred');
+      toast('An unexpected error occurred', 'error');
       setLoadingId(null);
     }
   };
@@ -47,8 +67,9 @@ export function ViolationsList({ initialViolations }: ViolationsListProps) {
   return (
     <div className="space-y-6">
       {error && (
-        <div className="text-xs font-semibold text-rose-600 bg-rose-50 dark:bg-rose-950/10 p-3 rounded-lg border border-rose-200 dark:border-rose-900/50">
-          {error}
+        <div className="text-xs font-semibold text-rose-600 bg-rose-50 dark:bg-rose-950/10 p-3 rounded-lg border border-rose-200 dark:border-rose-900/50 flex items-center gap-2">
+          <AlertCircle className="h-4 w-4 text-rose-600" />
+          <span>{error}</span>
         </div>
       )}
 
@@ -136,7 +157,7 @@ export function ViolationsList({ initialViolations }: ViolationsListProps) {
                       <td className="px-6 py-4 text-right">
                         {isPending ? (
                           <button
-                            onClick={() => handleAcknowledge(v.id)}
+                            onClick={() => triggerAcknowledgeConfirm(v)}
                             disabled={loadingId !== null}
                             className="inline-flex items-center justify-center px-3.5 py-1.5 text-xs font-bold bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 shadow-sm"
                           >
@@ -157,6 +178,43 @@ export function ViolationsList({ initialViolations }: ViolationsListProps) {
           </table>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {isConfirmOpen && selectedViolation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-sm bg-card rounded-xl border border-border p-6 shadow-xl space-y-6">
+            <div className="flex items-center gap-3 text-amber-500">
+              <div className="p-2 bg-amber-50 dark:bg-amber-950/20 rounded-lg">
+                <AlertTriangle className="h-6 w-6" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground">Acknowledge Violation?</h3>
+            </div>
+
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Confirm safety incident acknowledgment for worker <span className="font-bold text-foreground">{selectedViolation.workerName}</span> regarding <span className="font-bold text-foreground capitalize">{selectedViolation.type.replace('_', ' ')}</span>.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsConfirmOpen(false);
+                  setSelectedViolation(null);
+                }}
+                className="px-4 py-2 text-sm font-semibold border border-border rounded-lg hover:bg-muted transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAcknowledge}
+                className="px-4 py-2 text-sm font-semibold bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+              >
+                Confirm Acknowledge
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,52 +1,117 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { user, alert, violation } from '@/lib/db/schema';
-import { eq, and, gte, sql } from 'drizzle-orm';
+import { user, alert, violation, location } from '@/lib/db/schema';
+import { eq, and, gte, sql, lt, desc } from 'drizzle-orm';
 
 /**
  * Get statistics for the Admin Dashboard
  */
 export async function getAdminStats() {
   try {
-    // Total Workers count
-    const workersResult = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(user)
-      .where(eq(user.role, 'worker'));
-    const totalWorkers = workersResult[0]?.count || 0;
+    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
 
-    // Total Supervisors count
-    const supervisorsResult = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(user)
-      .where(eq(user.role, 'supervisor'));
-    const totalSupervisors = supervisorsResult[0]?.count || 0;
-
-    // Pending Violations count (status = 'open')
-    const pendingViolationsResult = await db
-      .select({ count: sql<number>`count(*)` })
+    const [
+      workersResult,
+      supervisorsResult,
+      pendingViolationsResult,
+      escalatedAlertsResult,
+      resolvedResult,
+      recentViolations,
+      recentEscalated,
+      rawViolations
+    ] = await Promise.all([
+      db.select({ count: sql<number>`count(*)` }).from(user).where(eq(user.role, 'worker')),
+      db.select({ count: sql<number>`count(*)` }).from(user).where(eq(user.role, 'supervisor')),
+      db.select({ count: sql<number>`count(*)` }).from(violation).where(eq(violation.status, 'open')),
+      db.select({ count: sql<number>`count(*)` }).from(violation).where(
+        and(
+          sql`status in ('open', 'pending', 'Open', 'Pending')`,
+          lt(violation.createdAt, tenMinutesAgo)
+        )
+      ),
+      db.select({ count: sql<number>`count(*)` }).from(violation).where(
+        sql`status in ('Acknowledged', 'acknowledged', 'resolved', 'Resolved')`
+      ),
+      db.select({
+        id: violation.id,
+        type: violation.type,
+        description: violation.description,
+        severity: violation.severity,
+        status: violation.status,
+        createdAt: violation.createdAt,
+        workerName: user.name,
+        locationName: location.name,
+      })
       .from(violation)
-      .where(eq(violation.status, 'open'));
-    const pendingViolations = pendingViolationsResult[0]?.count || 0;
-
-    // Escalated Alerts count (severity = 'critical' or 'high')
-    const escalatedAlertsResult = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(alert)
+      .innerJoin(user, eq(violation.workerId, user.id))
+      .leftJoin(location, eq(violation.locationId, location.id))
+      .orderBy(desc(violation.createdAt))
+      .limit(5),
+      db.select({
+        id: violation.id,
+        type: violation.type,
+        description: violation.description,
+        severity: violation.severity,
+        status: violation.status,
+        createdAt: violation.createdAt,
+        workerName: user.name,
+        locationName: location.name,
+      })
+      .from(violation)
+      .innerJoin(user, eq(violation.workerId, user.id))
+      .leftJoin(location, eq(violation.locationId, location.id))
       .where(
         and(
-          eq(alert.status, 'open'),
-          sql`severity in ('critical', 'high')`
+          sql`violation.status in ('open', 'pending', 'Open', 'Pending')`,
+          lt(violation.createdAt, tenMinutesAgo)
         )
-      );
-    const escalatedAlerts = escalatedAlertsResult[0]?.count || 0;
+      )
+      .orderBy(desc(violation.createdAt))
+      .limit(5),
+      db.select({
+        type: violation.type,
+        workerSite: user.site,
+        locationName: location.name,
+      })
+      .from(violation)
+      .innerJoin(user, eq(violation.workerId, user.id))
+      .leftJoin(location, eq(violation.locationId, location.id))
+    ]);
+
+    const siteMap: Record<string, number> = {};
+    const ppeMap: Record<string, number> = {};
+
+    rawViolations.forEach((v) => {
+      const site = v.locationName || v.workerSite || 'General Zone';
+      siteMap[site] = (siteMap[site] || 0) + 1;
+
+      const ppe = v.type.replace('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+      ppeMap[ppe] = (ppeMap[ppe] || 0) + 1;
+    });
+
+    const violationsBySite = Object.entries(siteMap).map(([site, count]) => ({
+      site,
+      count,
+    }));
+
+    const violationsByPpeType = Object.entries(ppeMap).map(([type, count]) => ({
+      name: type,
+      value: count,
+    }));
 
     return {
-      totalWorkers,
-      totalSupervisors,
-      pendingViolations,
-      escalatedAlerts,
+      totalWorkers: workersResult[0]?.count || 0,
+      totalSupervisors: supervisorsResult[0]?.count || 0,
+      pendingViolations: pendingViolationsResult[0]?.count || 0,
+      escalatedAlerts: escalatedAlertsResult[0]?.count || 0,
+      resolvedViolations: resolvedResult[0]?.count || 0,
+      recentViolations,
+      recentEscalated,
+      analyticsData: {
+        violationsBySite,
+        violationsByPpeType,
+      }
     };
   } catch (error) {
     console.error('Error fetching admin dashboard statistics:', error);
@@ -54,39 +119,105 @@ export async function getAdminStats() {
   }
 }
 
-/**
- * Get statistics for the Supervisor Dashboard
- */
 export async function getSupervisorStats() {
   try {
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
+    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
 
-    // Today's Violations count (created >= start of today)
-    const todayViolationsResult = await db
-      .select({ count: sql<number>`count(*)` })
+    const [
+      todayViolationsResult,
+      pendingViolationsResult,
+      ackViolationsResult,
+      resolvedResult,
+      recentViolations,
+      recentEscalated,
+      rawViolations
+    ] = await Promise.all([
+      db.select({ count: sql<number>`count(*)` }).from(violation).where(gte(violation.createdAt, startOfToday)),
+      db.select({ count: sql<number>`count(*)` }).from(violation).where(eq(violation.status, 'open')),
+      db.select({ count: sql<number>`count(*)` }).from(violation).where(eq(violation.status, 'acknowledged')),
+      db.select({ count: sql<number>`count(*)` }).from(violation).where(
+        sql`status in ('Acknowledged', 'acknowledged', 'resolved', 'Resolved')`
+      ),
+      db.select({
+        id: violation.id,
+        type: violation.type,
+        description: violation.description,
+        severity: violation.severity,
+        status: violation.status,
+        createdAt: violation.createdAt,
+        workerName: user.name,
+        locationName: location.name,
+      })
       .from(violation)
-      .where(gte(violation.createdAt, startOfToday));
-    const todayViolations = todayViolationsResult[0]?.count || 0;
+      .innerJoin(user, eq(violation.workerId, user.id))
+      .leftJoin(location, eq(violation.locationId, location.id))
+      .orderBy(desc(violation.createdAt))
+      .limit(5),
+      db.select({
+        id: violation.id,
+        type: violation.type,
+        description: violation.description,
+        severity: violation.severity,
+        status: violation.status,
+        createdAt: violation.createdAt,
+        workerName: user.name,
+        locationName: location.name,
+      })
+      .from(violation)
+      .innerJoin(user, eq(violation.workerId, user.id))
+      .leftJoin(location, eq(violation.locationId, location.id))
+      .where(
+        and(
+          sql`violation.status in ('open', 'pending', 'Open', 'Pending')`,
+          lt(violation.createdAt, tenMinutesAgo)
+        )
+      )
+      .orderBy(desc(violation.createdAt))
+      .limit(5),
+      db.select({
+        type: violation.type,
+        workerSite: user.site,
+        locationName: location.name,
+      })
+      .from(violation)
+      .innerJoin(user, eq(violation.workerId, user.id))
+      .leftJoin(location, eq(violation.locationId, location.id))
+    ]);
 
-    // Pending Violations count (status = 'open')
-    const pendingViolationsResult = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(violation)
-      .where(eq(violation.status, 'open'));
-    const pendingViolations = pendingViolationsResult[0]?.count || 0;
+    const siteMap: Record<string, number> = {};
+    const ppeMap: Record<string, number> = {};
 
-    // Acknowledged Violations count (status = 'acknowledged')
-    const ackViolationsResult = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(violation)
-      .where(eq(violation.status, 'acknowledged'));
-    const acknowledgedViolations = ackViolationsResult[0]?.count || 0;
+    rawViolations.forEach((v) => {
+      const site = v.locationName || v.workerSite || 'General Zone';
+      siteMap[site] = (siteMap[site] || 0) + 1;
+
+      const ppe = v.type.replace('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+      ppeMap[ppe] = (ppeMap[ppe] || 0) + 1;
+    });
+
+    const violationsBySite = Object.entries(siteMap).map(([site, count]) => ({
+      site,
+      count,
+    }));
+
+    const violationsByPpeType = Object.entries(ppeMap).map(([type, count]) => ({
+      name: type,
+      value: count,
+    }));
 
     return {
-      todayViolations,
-      pendingViolations,
-      acknowledgedViolations,
+      todayViolations: todayViolationsResult[0]?.count || 0,
+      pendingViolations: pendingViolationsResult[0]?.count || 0,
+      acknowledgedViolations: ackViolationsResult[0]?.count || 0,
+      resolvedViolations: resolvedResult[0]?.count || 0,
+      recentViolations,
+      recentEscalated,
+      analyticsData: {
+        violationsBySite,
+        violationsByPpeType,
+      }
     };
   } catch (error) {
     console.error('Error fetching supervisor dashboard statistics:', error);

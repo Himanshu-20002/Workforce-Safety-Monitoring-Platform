@@ -31,28 +31,26 @@ export async function getWorkers(options: FetchWorkersOptions = {}) {
 
     const whereClause = and(...conditions);
 
-    // Fetch workers
-    const workers = await db
-      .select()
-      .from(user)
-      .where(whereClause)
-      .limit(limit)
-      .offset(offset);
+    // Fetch workers, total count, and unique sites in parallel
+    const [workers, totalCountResult, sitesResult] = await Promise.all([
+      db
+        .select()
+        .from(user)
+        .where(whereClause)
+        .limit(limit)
+        .offset(offset),
+      db
+        .select({ count: sql<number>`count(*)` })
+        .from(user)
+        .where(whereClause),
+      db
+        .selectDistinct({ site: user.site })
+        .from(user)
+        .where(eq(user.role, 'worker'))
+    ]);
 
-    // Fetch total count for pagination
-    const totalCountResult = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(user)
-      .where(whereClause);
-    
     const totalWorkers = totalCountResult[0]?.count || 0;
     const totalPages = Math.ceil(totalWorkers / limit);
-
-    // Fetch unique sites for the filter dropdown
-    const sitesResult = await db
-      .selectDistinct({ site: user.site })
-      .from(user)
-      .where(eq(user.role, 'worker'));
     const sites = sitesResult.map((s) => s.site).filter(Boolean) as string[];
 
     return {

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createSupervisor, deleteSupervisor } from '@/actions/supervisors';
 import { UserCheck, Trash2, X, Plus, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { z } from 'zod';
+import { useToast } from '@/components/ui/toast';
 
 const supervisorSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -30,6 +31,7 @@ export function SupervisorManager({ initialSupervisors }: SupervisorManagerProps
   const [selectedSupervisor, setSelectedSupervisor] = useState<Supervisor | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { toast } = useToast();
 
   // Form states
   const [name, setName] = useState('');
@@ -51,6 +53,7 @@ export function SupervisorManager({ initialSupervisors }: SupervisorManagerProps
 
       const res = await createSupervisor(parsed.data);
       if (res.success) {
+        toast(`Supervisor ${name} created successfully.`, 'success');
         setIsAddOpen(false);
         // Reset fields
         setName('');
@@ -58,11 +61,14 @@ export function SupervisorManager({ initialSupervisors }: SupervisorManagerProps
         setPassword('');
         window.location.reload();
       } else {
-        setError(res.error || 'Failed to create supervisor');
+        const errMsg = res.error || 'Failed to create supervisor';
+        setError(errMsg);
+        toast(errMsg, 'error');
         setLoading(false);
       }
     } catch (err) {
       setError('An unexpected error occurred');
+      toast('An unexpected error occurred', 'error');
       setLoading(false);
     }
   };
@@ -75,15 +81,19 @@ export function SupervisorManager({ initialSupervisors }: SupervisorManagerProps
     try {
       const res = await deleteSupervisor(selectedSupervisor.id);
       if (res.success) {
+        toast(`Supervisor ${selectedSupervisor.name} deleted successfully.`, 'success');
         setIsDeleteOpen(false);
         setSelectedSupervisor(null);
         window.location.reload();
       } else {
-        setError(res.error || 'Failed to delete supervisor');
+        const errMsg = res.error || 'Failed to delete supervisor';
+        setError(errMsg);
+        toast(errMsg, 'error');
         setLoading(false);
       }
     } catch (err) {
       setError('An unexpected error occurred');
+      toast('An unexpected error occurred', 'error');
       setLoading(false);
     }
   };

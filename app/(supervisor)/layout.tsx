@@ -11,7 +11,7 @@ export default async function SupervisorLayout({
   const session = await auth.api.getSession({ headers: await headers() });
   const role = (session?.user as any)?.role;
 
-  if (role !== 'supervisor') {
+  if (role !== 'supervisor' && role !== 'admin') {
     redirect('/');
   }
 

@@ -4,7 +4,7 @@ import { headers } from 'next/headers';
 import { auth } from '@/lib/auth';
 import { LazyAnalyticsDashboard } from '@/components/analytics/lazy-analytics-dashboard';
 
-export default async function AnalyticsPage() {
+export default async function SupervisorAnalyticsPage() {
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session?.user) {
@@ -12,7 +12,7 @@ export default async function AnalyticsPage() {
   }
 
   const role = (session.user as any).role;
-  if (role !== 'admin') {
+  if (role !== 'supervisor' && role !== 'admin') {
     redirect('/');
   }
 
