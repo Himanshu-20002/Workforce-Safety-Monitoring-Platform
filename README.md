@@ -146,6 +146,7 @@ Stores account credentials, profile details, and role assignments:
 *   `site` (text) — Assigned safety location zone
 *   `status` (text, default: 'Active') — `'Active' | 'Pending' | 'Escalated'`
 *   `jobProfile` (text)
+*   `employeeId` (text) — Custom employee identification code (e.g., `WRK0001`)
 *   *Indexes:* Optimized search index on the `role` column.
 
 ### 2. `violation` Table
