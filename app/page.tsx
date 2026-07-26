@@ -1,7 +1,7 @@
 import { headers } from 'next/headers';
 import { auth } from '@/lib/auth';
 import Link from 'next/link';
-import { AnimatedCounter } from '@/components/animated-counter';
+import { AnimatedCounter } from '@/components/ui/animated-counter';
 
 export default async function LandingPage() {
   const session = await auth.api.getSession({ headers: await headers() });

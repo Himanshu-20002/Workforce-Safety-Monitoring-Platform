@@ -185,9 +185,10 @@ guard-ops/
 │   ├── api/                         # Backend APIs (Authentication & Ingestion endpoints)
 │   └── layout.tsx                   # Main layout wrapper
 ├── components/                      # UI Components
+│   ├── auth/                        # Authentication form components (AuthForm)
 │   ├── dashboard/                   # Metric cards, statistics widgets, and charts
 │   ├── layout/                      # Shared layouts (sidebar navigation)
-│   ├── ui/                          # Shared UI elements (Button, Input, Toast notifications)
+│   ├── ui/                          # Shared UI elements (Button, Input, Toast, AnimatedCounter)
 │   └── workers/                     # Shared worker management table & actions
 ├── actions/                         # Next.js type-safe Server Actions
 │   ├── alerts.ts                    # Handles escalated admin alerts queries
