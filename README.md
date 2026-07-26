@@ -6,7 +6,7 @@ GuardOps is a comprehensive safety telemetry registry and management application
 
 ## 1. System Architecture & Flow
 
-GuardOps connects remote IoT/AI safety cameras with administrators and site supervisors using a modern, decoupled, yet strongly integrated architecture.
+GuardOps connects remote safety cameras, site supervisors, and administrators together so they can monitor and manage safety alerts in one place.
 
 ```mermaid
 graph TD
