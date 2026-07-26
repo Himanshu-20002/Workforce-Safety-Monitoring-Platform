@@ -10,7 +10,6 @@ const geistMono = Geist_Mono({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Workforce Safety Monitoring Platform',
   description: 'A comprehensive PPE and workforce safety monitoring system',
-  generator: 'v0.app',
   keywords: [
     'workforce safety',
     'PPE monitoring',
@@ -18,21 +17,9 @@ export const metadata: Metadata = {
     'occupational health',
   ],
   icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
   },
 };
 

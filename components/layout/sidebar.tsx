@@ -9,6 +9,7 @@ import {
   UserCheck,
   AlertTriangle,
   ShieldAlert,
+  Shield,
   FileText,
   Menu,
   X,
@@ -132,11 +133,14 @@ export function Sidebar({ session }: SidebarProps) {
         <div className="flex flex-col flex-1 p-6 space-y-8">
           {/* Logo */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="h-9 w-9 bg-primary rounded-xl flex items-center justify-center text-primary-foreground font-bold shadow-sm shadow-primary/25">
-                G
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center text-primary shadow-sm">
+                <Shield className="h-5 w-5 fill-primary/20 text-primary" />
               </div>
-              <span className="text-xl font-bold tracking-tight text-foreground">GuardOps</span>
+              <div>
+                <span className="text-lg font-bold tracking-tight text-foreground block leading-tight">GuardOps</span>
+                <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block">Safety Ops</span>
+              </div>
             </div>
             {/* Mobile close button */}
             <button

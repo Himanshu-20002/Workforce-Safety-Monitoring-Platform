@@ -4,7 +4,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
 import { useSession } from '@/lib/auth-client';
 import { useState, useEffect } from 'react';
-import { Sun, Moon, LogOut, ChevronDown } from 'lucide-react';
+import { Sun, Moon, LogOut, ChevronDown, Shield } from 'lucide-react';
 
 export function Navbar() {
   const router = useRouter();
@@ -75,7 +75,12 @@ export function Navbar() {
   return (
     <nav className="bg-card border-b border-border px-6 py-4 flex items-center justify-between">
       <div className="flex items-center gap-8">
-        <h1 className="text-xl font-bold">Workforce Safety</h1>
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 bg-primary/10 border border-primary/20 rounded-lg flex items-center justify-center text-primary shadow-xs">
+            <Shield className="h-4 w-4 fill-primary/20 text-primary" />
+          </div>
+          <h1 className="text-lg font-bold text-foreground tracking-tight">GuardOps</h1>
+        </div>
         
         {/* Navigation links based on role */}
         <div className="hidden md:flex items-center gap-6 text-sm">
