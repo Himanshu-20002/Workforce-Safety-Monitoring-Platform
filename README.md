@@ -187,10 +187,15 @@ guard-ops/
 │   └── layout.tsx                   # Main layout wrapper
 ├── components/                      # UI Components
 │   ├── auth/                        # Authentication form components (AuthForm)
-│   ├── dashboard/                   # Metric cards, statistics widgets, and charts
+│   ├── features/                    # Feature domain modules
+│   │   ├── analytics/               # Telemetry charts & data visualizations
+│   │   ├── dashboard/               # Metric cards, statistics widgets, and charts
+│   │   ├── reports/                 # Compliance reports & CSV generator
+│   │   ├── supervisors/             # Supervisor management & CRUD
+│   │   ├── violations/              # Safety violations list & acknowledgment dialogs
+│   │   └── workers/                 # Shared worker management table & actions
 │   ├── layout/                      # Shared layouts (sidebar navigation)
-│   ├── ui/                          # Shared UI elements (Button, Input, Toast, AnimatedCounter)
-│   └── workers/                     # Shared worker management table & actions
+│   └── ui/                          # Shared base UI elements (Button, Input, Toast, AnimatedCounter)
 ├── actions/                         # Next.js type-safe Server Actions
 │   ├── alerts.ts                    # Handles escalated admin alerts queries
 │   ├── dashboard.ts                 # Fetches administrative statistical summaries
