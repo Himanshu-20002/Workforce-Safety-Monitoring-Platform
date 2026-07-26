@@ -11,7 +11,9 @@ export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   
   // Check if user has valid session cookie (set by Better Auth)
-  const hasSessionCookie = request.cookies.has('better-auth.session_token');
+  const hasSessionCookie =
+    request.cookies.has('better-auth.session_token') ||
+    request.cookies.has('__Secure-better-auth.session_token');
 
   // Immediately bypass middleware for static assets (icons, images, public folder assets)
   if (
