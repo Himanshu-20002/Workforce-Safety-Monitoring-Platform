@@ -1,6 +1,7 @@
 # GuardOps: Workforce Safety & PPE Monitoring Platform
 
-**Live Production Link:** [workforce-safety-monitoring-platfor.vercel.app](https://workforce-safety-monitoring-platfor.vercel.app/)
+**Live Production Link:** [workforce-safety-monitoring-platfor.vercel.app](https://workforce-safety-monitoring-platfor.vercel.app/)  
+**Video Walkthrough:** [Watch Demo & Walkthrough Video](https://drive.google.com/file/d/115MC3ldq7HvS2M01q42crBMHg_9LnnrA/view?usp=sharing)
 
 GuardOps is a comprehensive safety telemetry registry and management application designed for high-risk industrial environments (such as oil refineries, manufacturing sites, and construction zones). It ingests real-time IoT/camera telemetry of worker safety breaches, coordinates supervisor response, and provides automated escalation protocols for unacknowledged safety violations.
 
